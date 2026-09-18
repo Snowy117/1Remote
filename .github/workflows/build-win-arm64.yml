@@ -27,8 +27,7 @@ jobs:
       - name: Pack
         run: |
           echo "SHA7=${GITHUB_SHA::7}" >> "$GITHUB_ENV"
-          cd publish/win-arm64
-          zip -r "../../1Remote-win-arm64-${GITHUB_SHA::7}.zip" .
+          zip -r "publish/1Remote-win-arm64-${GITHUB_SHA::7}.zip" publish/win-arm64
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
