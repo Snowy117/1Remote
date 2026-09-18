@@ -1,0 +1,38 @@
+name: Build win-arm64
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout (with submodules)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Publish win-arm64 (self-contained)
+        run: |
+          dotnet publish Ui/Ui.csproj -c Release -r win-arm64 --self-contained true \
+            -p:EnableWindowsTargeting=true -o publish/win-arm64
+
+      - name: Pack
+        run: |
+          echo "SHA7=${GITHUB_SHA::7}" >> "$GITHUB_ENV"
+          cd publish/win-arm64
+          zip -r "../../1Remote-win-arm64-${GITHUB_SHA::7}.zip" .
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: 1Remote-win-arm64-${{ env.SHA7 }}
+          path: publish/1Remote-win-arm64-${{ env.SHA7 }}.zip
+          if-no-files-found: error
