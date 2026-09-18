@@ -19,19 +19,35 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
-      - name: Publish win-arm64 (self-contained)
+      - name: Publish win-arm64 (framework-dependent, single-file)
+        run: |
+          dotnet publish Ui/Ui.csproj -c Release -r win-arm64 --self-contained false \
+            -p:EnableWindowsTargeting=true -p:PublishSingleFile=true \
+            -p:IncludeNativeLibrariesForSelfExtract=true -o publish/fdd
+
+      - name: Publish win-arm64 (self-contained, single-file, compressed)
         run: |
           dotnet publish Ui/Ui.csproj -c Release -r win-arm64 --self-contained true \
-            -p:EnableWindowsTargeting=true -o publish/win-arm64
+            -p:EnableWindowsTargeting=true -p:PublishSingleFile=true \
+            -p:IncludeNativeLibrariesForSelfExtract=true \
+            -p:EnableCompressionInSingleFile=true -o publish/sc
 
       - name: Pack
         run: |
           echo "SHA7=${GITHUB_SHA::7}" >> "$GITHUB_ENV"
-          zip -r "publish/1Remote-win-arm64-${GITHUB_SHA::7}.zip" publish/win-arm64
+          (cd publish/fdd && zip -9 "../../1Remote-win-arm64-fdd-${GITHUB_SHA::7}.zip" 1Remote.exe)
+          (cd publish/sc  && zip -9 "../../1Remote-win-arm64-sc-${GITHUB_SHA::7}.zip" 1Remote.exe)
 
-      - name: Upload artifact
+      - name: Upload artifact (framework-dependent)
         uses: actions/upload-artifact@v4
         with:
-          name: 1Remote-win-arm64-${{ env.SHA7 }}
-          path: publish/1Remote-win-arm64-${{ env.SHA7 }}.zip
+          name: 1Remote-win-arm64-fdd-${{ env.SHA7 }}
+          path: 1Remote-win-arm64-fdd-*.zip
+          if-no-files-found: error
+
+      - name: Upload artifact (self-contained)
+        uses: actions/upload-artifact@v4
+        with:
+          name: 1Remote-win-arm64-sc-${{ env.SHA7 }}
+          path: 1Remote-win-arm64-sc-*.zip
           if-no-files-found: error
