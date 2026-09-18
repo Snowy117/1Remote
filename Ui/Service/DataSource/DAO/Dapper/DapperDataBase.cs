@@ -4,7 +4,7 @@ using System.Data;
 using System.Linq;
 using Dapper;
 using _1RM.Model.Protocol.Base;
-using System.Data.SQLite;
+using Microsoft.Data.Sqlite;
 using MySql.Data.MySqlClient;
 using Npgsql;
 using NUlid;
@@ -45,9 +45,9 @@ namespace _1RM.Service.DataSource.DAO.Dapper
             lock (this)
             {
                 _dbConnection?.Close();
-                if (DatabaseType == DatabaseType.Sqlite && _dbConnection is SQLiteConnection sqliteConn)
+                if (DatabaseType == DatabaseType.Sqlite && _dbConnection is SqliteConnection sqliteConn)
                 {
-                    SQLiteConnection.ClearPool(sqliteConn);
+                    SqliteConnection.ClearPool(sqliteConn);
                 }
             }
         }
@@ -93,7 +93,7 @@ namespace _1RM.Service.DataSource.DAO.Dapper
                 _dbConnection = DatabaseType switch
                 {
                     DatabaseType.MySql => new MySqlConnection(_connectionString),
-                    DatabaseType.Sqlite => new SQLiteConnection(_connectionString),
+                    DatabaseType.Sqlite => new SqliteConnection(_connectionString),
                     DatabaseType.SqlServer => throw new NotImplementedException(DatabaseType.ToString() + " not supported!"),
                     DatabaseType.PostgreSQL => new NpgsqlConnection(_connectionString),
                     DatabaseType.Oracle => throw new NotImplementedException(DatabaseType.ToString() + " not supported!"),

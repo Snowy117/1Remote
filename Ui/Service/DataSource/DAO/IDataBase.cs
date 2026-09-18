@@ -236,7 +236,7 @@ namespace _1RM.Service.DataSource.DAO
                 // Convert UNC path to file URI format: \\server\share\path -> \\\\server\share\path
                 dataSource = "\\\\\\\\" + dataSource.Trim('\\');
             }
-            return $"Data Source={dataSource}; Pooling=true;Min Pool Size=1";
+            return $"Data Source={dataSource}; Pooling=true";
         }
 
         public static string GetMysqlConnectionString(string host, int port, string dbName, string user, string password, int connectTimeOutSeconds)
